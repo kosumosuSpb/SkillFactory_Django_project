@@ -1,4 +1,4 @@
-from django_filters import FilterSet, DateFilter
+from django_filters import FilterSet
 from .models import Post
 
 
