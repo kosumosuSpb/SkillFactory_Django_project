@@ -1,0 +1,67 @@
+<!--  наследуемся от шаблона default.html -->
+{% extends 'default.html' %}
+{% load custom_filters %}
+<!-- Название  -->
+{% block title %}
+Posts
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим все статьи -->
+{% block content %}
+<h1>Все статьи</h1>
+    {% if posts %}
+        <p>Всего статей: {{ posts|length }}.</p>
+        <table>
+        <thead>
+            <tr>
+                <td>Заголовок</td>
+                <td>Дата</td>
+                <td>Превью текста</td>
+            </tr>
+        </thead>
+            {% for post in posts %}
+            <tr>
+                <td>
+                    <!-- в ссылке post - это то, что прописано в urls.py в path: path('<int:pk>/', PostDetail.as_view(), name='post') -->
+                    <a href="{% url 'post' post.id %}">{{ post.title }}</a>
+                    <a href="{% url 'post_update' post.id %}">Изменить</a>
+                    <a href="{% url 'post_delete' post.id %}">Удалить</a>
+                </td>
+                <td>{{ post.date_time|date:'d M Y' }}</td>
+                <td>{{ post.text|truncatechars:50|censor }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <p><a href="{% url 'post_create' %}">Добавить новый пост</a></p>
+
+    <!-- Проверяем, что поддерживается постраничный вывод -->
+{% if is_paginated %}
+
+    <!-- Если доступна предыдущая страница, то даём ссылку на неё и самую первую страницу -->
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+
+{% endif %}
+
+    {% else %}
+    <h2>Статей нет</h2>
+    {% endif %}
+{% endblock content %}

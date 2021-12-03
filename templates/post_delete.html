@@ -1,0 +1,22 @@
+<!--  наследуемся от шаблона default.html -->
+{% extends 'default.html' %}
+
+<!-- Название  -->
+{% block title %}
+Post Delete
+{% endblock title %}
+{% load custom_filters %}
+<!-- В контенте на странице выводим статью, id которой был передан -->
+{% block content %}
+<h1>{{ post.title|censor }}</h1>
+    <h2>Вы действительно хотите удалить эту статью?</h2>
+        <form method="POST">
+            {% csrf_token %}
+        <input type="submit" value="подтвердить">
+        </form>
+
+
+
+
+
+{% endblock content %}

@@ -1,0 +1,18 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'default.html' %}
+
+<!-- Название  -->
+{% block title %}
+Новость
+{% endblock title %}
+{% load custom_filters %}
+<!-- В контенте на странице выводим статью, id которой был передан -->
+{% block content %}
+<h1>{{ news_post.title|censor }}</h1>
+    <p>{{ news_post.text|censor }}</p>
+    <p>Автор: <b>{{ news_post.author.user.username }}</b></p>
+    <p><i>Дата: {{ news_post.date_time|date:'d E Y, H:i' }}</i></p>
+
+
+
+{% endblock content %}
