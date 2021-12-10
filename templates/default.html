@@ -42,6 +42,15 @@
                            <a class="nav-link" href="/admin/">admin login</a>
                        </li>
 
+                       {% if is_auth %}
+                       <li class="nav-item">
+                           <p class="nav-link"> Вы авторизованы как: {{request.user.username}} | <button> <a href="/accounts/logout/">Выйти</a> </button></p>
+                       </li>{% endif %}
+
+                   {% if not is_auth %}
+                   <button> <a href="/accounts/login/">Войти</a></button>
+                   {% endif %}
+
                    </ul>
                </div>
            </div>

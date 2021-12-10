@@ -21,8 +21,12 @@ urlpatterns = [
     # видимо, надо подключить ещё и статические страницы, потому что через них надо будет шаблоны вывода делать
     # path('pages/', include('django.contrib.flatpages.urls')),
 
+    path('', include('news.urls')),
+
     # делаем так, чтобы все адреса из нашего приложения (приложение/urls.py)
     # сами автоматически подключались, когда мы их добавим.
     path('posts/', include('news.urls')),
+    path('sign/', include('sign.urls')),
+    path('accounts/', include('allauth.urls')),
 
 ]

@@ -50,6 +50,12 @@ class Post(models.Model):
     # связь «многие ко многим» с моделью Category (через дополнительную модель PostCategory)
     categories = models.ManyToManyField(Category, through='PostCategory', related_name='posts')
 
+    def get_category_names(self):
+        result = []
+        for category in self.categories.all():
+            result.append(category.name)
+        return result
+
     # абсолютный путь, чтобы после создания нас перебрасывало на страницу с постом
     def get_absolute_url(self):
         return f'/posts/{self.id}'

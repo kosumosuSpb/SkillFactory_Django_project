@@ -24,8 +24,10 @@ Posts
                 <td>
                     <!-- в ссылке post - это то, что прописано в urls.py в path: path('<int:pk>/', PostDetail.as_view(), name='post') -->
                     <a href="{% url 'post' post.id %}">{{ post.title }}</a>
+                    {% if is_auth %}
                     <a href="{% url 'post_update' post.id %}">Изменить</a>
                     <a href="{% url 'post_delete' post.id %}">Удалить</a>
+                    {% endif %}
                 </td>
                 <td>{{ post.date_time|date:'d M Y' }}</td>
                 <td>{{ post.text|truncatechars:50|censor }}</td>
@@ -33,7 +35,14 @@ Posts
             {% endfor %}
         </table>
 
+        {% if is_auth %}
         <p><a href="{% url 'post_create' %}">Добавить новый пост</a></p>
+        <p>{% if is_not_author %}
+            <button>
+                <a href="/sign/upgrade/">Стать автором</a>
+            </button>
+            {% endif %}{% endif %}
+        </p>
 
     <!-- Проверяем, что поддерживается постраничный вывод -->
 {% if is_paginated %}
