@@ -69,7 +69,7 @@ def post_save_post(created, **kwargs):
                                                                    'text': text_message})
 
         # формируем письмо
-        msg = EmailMultiAlternatives(subject, text_message, email_from, user_instance.email)
+        msg = EmailMultiAlternatives(subject, text_message, email_from, [user_instance.email, ])
         # прикрепляем хтмл-шаблон
         msg.attach_alternative(render_html_template, 'text/html')
         # отправляем
