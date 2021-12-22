@@ -24,7 +24,7 @@ Posts
                 <td>
                     <!-- в ссылке post - это то, что прописано в urls.py в path: path('<int:pk>/', PostDetail.as_view(), name='post') -->
                     <a href="{% url 'post' post.id %}">{{ post.title }}</a>
-                    {% if is_auth %}
+                    {% if is_author %}
                     <a href="{% url 'post_update' post.id %}">Изменить</a>
                     <a href="{% url 'post_delete' post.id %}">Удалить</a>
                     {% endif %}
@@ -35,9 +35,9 @@ Posts
             {% endfor %}
         </table>
 
-        {% if is_auth %}
+        {% if is_author %}
         <p><a href="{% url 'post_create' %}">Добавить новый пост</a></p>
-        <p>{% if is_not_author %}
+        <p>{% if not is_author %}
             <button>
                 <a href="/sign/upgrade/">Стать автором</a>
             </button>

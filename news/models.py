@@ -33,6 +33,9 @@ class Category(models.Model):
     name = models.CharField(unique=True, max_length=100)
     # Фактически тут автоматом создастся атрибут posts со связью многие-ко-многим с моделью Post
 
+    # поле для хранения подписавшихся на эту категорию пользователей
+    subscribed_users = models.ManyToManyField(User, related_name='subscribed_categories')
+
     def __str__(self):
         return self.name
 
@@ -50,10 +53,16 @@ class Post(models.Model):
     # связь «многие ко многим» с моделью Category (через дополнительную модель PostCategory)
     categories = models.ManyToManyField(Category, through='PostCategory', related_name='posts')
 
-    def get_category_names(self):
+    def get_categories(self):
         result = []
         for category in self.categories.all():
-            result.append(category.name)
+            result.append(category)
+        return result
+
+    def get_comments(self):
+        result = []
+        for comment in self.comments.all():
+            result.append(comment)
         return result
 
     # абсолютный путь, чтобы после создания нас перебрасывало на страницу с постом

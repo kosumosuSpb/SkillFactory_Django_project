@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from news.mail_pass import mail_pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+import news.apps
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -48,6 +51,23 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
+# EMAIL CONFIG
+EMAIL_FROM = 'dek18@yandex.ru'
+
+EMAIL_HOST = 'smtp.yandex.ru'  # адрес сервера Яндекс-почты для всех один и тот же
+EMAIL_PORT = 465  # порт smtp сервера тоже одинаковый
+EMAIL_HOST_USER = 'dekonstantin18'  # имя пользователя
+EMAIL_HOST_PASSWORD = mail_pass  # пароль от почты
+EMAIL_USE_SSL = True  # Яндекс использует ssl
+
+# APSCHEDULER SETTINGS
+# формат даты, которую будет воспринимать наш задачник (вспоминаем модуль по фильтрам)
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+# если задача не выполняется за 25 секунд, то она автоматически снимается
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -67,9 +87,11 @@ INSTALLED_APPS = [
 
     # подключаем наше приложение новостей и статей
     # (автоматом при создании проекта создалось в данном случае)
+    # тут же подключаются сигналы (они в ready внутри NewsConfig прописаны)
     'news.apps.NewsConfig',
 
     # приложение для авторизации
+    # хотя фактически сейчас используется allauth
     'sign',
 
     'allauth',
@@ -77,6 +99,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # providers you want to enable:
     'allauth.socialaccount.providers.google',
+
+    # модуль для периодических задач
+    'django_apscheduler',
+
 ]
 
 MIDDLEWARE = [

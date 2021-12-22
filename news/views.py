@@ -1,4 +1,5 @@
-from django.shortcuts import render  # на фиг не нужно
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect  # на фиг не нужно
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin  # проверка авторизации и прав доступа
 from .filters import PostFilter  # импорт фильтра для представления страницы с фильтрами статей
@@ -19,7 +20,7 @@ class PostList(ListView):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         context['form'] = PostForm()
-        context['is_not_author'] = not self.request.user.groups.filter(name='author').exists()
+        context['is_author'] = self.request.user.groups.filter(name='author').exists()
         context['is_auth'] = self.request.user.is_authenticated
         return context
 
@@ -58,6 +59,15 @@ class PostDetail(DetailView):
     template_name = 'post.html'
     context_object_name = 'post'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        context['form'] = PostForm()
+        context['is_author'] = self.request.user.groups.filter(name='author').exists()
+        context['is_auth'] = self.request.user.is_authenticated
+        context['current_user'] = self.request.user
+        return context
+
 
 # создание поста. Указываем шаблон и форму ввода
 class PostCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -94,3 +104,28 @@ class NewsList(ListView):
     context_object_name = 'news_posts'
     queryset = Post.objects.filter(type='news')
     paginate_by = 10
+
+
+# Подписка пользователя на категорию
+# по сути создаёт связь модели категории с моделью пользователя
+@login_required
+def subscribe_category(request):
+    user = request.user  # получаем из реквеста самого пользователя
+    cat_id = request.POST['cat_id']  # получаем из реквеста то, что пришло из формы через ПОСТ
+    category = Category.objects.get(pk=int(cat_id))  # получаем категорию через cat_id, который пришёл через ПОСТ через скрытое поле
+
+    # если связь пользователя с категорией не создана,
+    # второй вариант - проверять имя кнопки, которая пришла с реквестом
+    # и условие строить уже на этом
+    if user not in category.subscribed_users.all():
+        # добавляем пользователя в связь с категорией
+        category.subscribed_users.add(user)
+
+    # а если связь уже есть, то отписываем, т.е. удаляем из этой связи
+    else:
+        category.subscribed_users.remove(user)
+
+    # после чего возвращаем на предыдущую страницу, которую берём из реквеста
+    # она хранится в META, а это словарь, поэтому достаём через гет
+    # если этого ключа нет, то возвращается рут и редирект кидает в корень
+    return redirect(request.META.get('HTTP_REFERER', '/'))

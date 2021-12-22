@@ -11,8 +11,47 @@ Posts
 <h1>{{ post.title|censor }}</h1>
     <p>{{ post.text|censor }}</p>
     <p>Автор: <b>{{ post.author.user.username }}</b></p>
+    <div>Категории:
+        {% for cat in post.get_categories %}
+
+            {{ cat.name }}
+
+            <!-- если пользователь авторизован, то показываем форму подписки -->
+            {% if is_auth %}
+            <form action="/subscribe/" method="POST">
+                {% csrf_token %}
+
+                <!-- передаём через скрытое поле id категории -->
+                <input type="hidden" name="cat_id" value="{{ cat.id }}">
+                <!-- если пользователя нет в категориях то отображаем кнопку Подписаться-->
+                {% if current_user not in cat.subscribed_users.all %}
+                <input type="submit" name="subscribe_button" value="Подписаться">
+                {% else %}
+                <!-- если пользователь есть в категориях то отображаем кнопку Отписаться-->
+                <input type="submit" name="unsubscribe_button" value="Отписаться">
+                {% endif %}
+            </form>
+            {% endif %}
+
+        {% endfor %} </div>
     <p><i>Дата: {{ post.date_time|date:'d E Y, H:i' }}</i></p>
 
+    {% if post.get_comments %}
+    <table>
+    {% for comment in post.get_comments %}
+        <tr>
+            <td>
+                <p>{{ comment.text }}</p>
+                <p><i>{{ comment.date_time }}</i></p>
+                <p><b>{{ comment.user.username }}</b></p>
+            </td>
+        </tr>
+    {% endfor %}
+
+    </table>
+        {% else %}
+        <p>Комментариев нет</p>
+    {% endif %}
 
 
 {% endblock content %}
