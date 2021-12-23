@@ -64,9 +64,9 @@ def post_save_post(created, **kwargs):
         text_message = 'Приветственный текст'
 
         # рендерим в строку шаблон письма и передаём туда переменные, которые в нём используем
-        render_html_template = render_to_string('send_post.html', {'user': user_instance,
-                                                                   'subject': subject,
-                                                                   'text': text_message})
+        render_html_template = render_to_string('hello_message.html', {'user': user_instance,
+                                                                       'subject': subject,
+                                                                       'text': text_message})
 
         # формируем письмо
         msg = EmailMultiAlternatives(subject, text_message, email_from, [user_instance.email, ])
