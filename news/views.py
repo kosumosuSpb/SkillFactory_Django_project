@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect  # на фиг не нужно
+from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin  # проверка авторизации и прав доступа
 from .filters import PostFilter  # импорт фильтра для представления страницы с фильтрами статей

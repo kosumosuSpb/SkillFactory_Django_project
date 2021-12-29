@@ -16,6 +16,7 @@ from news.mail_pass import mail_pass
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import news.apps
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -33,6 +34,13 @@ SITE_ID = 1
 
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
+
+# CELERY/REDIS
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 
 AUTHENTICATION_BACKENDS = [
