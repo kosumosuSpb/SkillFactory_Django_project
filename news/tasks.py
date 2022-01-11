@@ -1,5 +1,5 @@
 from celery import shared_task
-from SFNewsPortal.celery_django import app as celery_app
+from sf_news_project.celery import app as celery_app
 
 from django.conf import settings
 
@@ -49,6 +49,7 @@ def send_posts(email_list, posts):
 
 # задача для рассылки статей за последние 7 дней по почте
 # пользователя, которые подписались на категории
+# можно и celery_app.task и shared_task, но предпочтительно вроде второе
 @shared_task()
 def send_posts_to_email_weekly():
     """
@@ -56,9 +57,6 @@ def send_posts_to_email_weekly():
     (через вызов вспомогательной функции) их всем, кто подписан на категории, куда эти статьи входят
     :return: None
     """
-
-    # DEBUG
-    print('START TASK')
 
     # берём посты за последние 7 дней
     # здесь мы получаем queryset
@@ -80,6 +78,3 @@ def send_posts_to_email_weekly():
     # непосредственно рассылка
     for user, posts in posts_for_user.items():
         send_posts(user.email, posts)
-
-        # DEBUG
-        print('TASK FIFNISHED')

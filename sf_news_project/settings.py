@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 from news.mail_pass import mail_pass
 
@@ -36,8 +36,15 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 
 # CELERY/REDIS
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+
+# вариант для локального редиса под WLS
+# CELERY_BROKER_URL = 'redis://localhost:6379'  # URL брокера сообщений (Redis).
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379'  # хранилище результатов выполнения задач
+
+# Вариант для облачного редиса
+# формат: redis://юзернейм(у_нас_тут_пустой):пароль@эндпоинт:порт/0
+CELERY_BROKER_URL = 'redis://:FaUmx3YAWwHTqMcRhKSithVxmSP2hPew@redis-14990.c293.eu-central-1-1.ec2.cloud.redislabs.com:14990/0'
+CELERY_RESULT_BACKEND = 'redis://:FaUmx3YAWwHTqMcRhKSithVxmSP2hPew@redis-14990.c293.eu-central-1-1.ec2.cloud.redislabs.com:14990/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -126,7 +133,7 @@ MIDDLEWARE = [
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
 
-ROOT_URLCONF = 'SFNewsPortal.urls'
+ROOT_URLCONF = 'sf_news_project.urls'
 
 TEMPLATES = [
     {
@@ -145,7 +152,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'SFNewsPortal.wsgi.application'
+WSGI_APPLICATION = 'sf_news_project.wsgi.application'
 
 
 # Database

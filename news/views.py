@@ -13,7 +13,7 @@ class PostList(ListView):
     template_name = 'posts.html'
     context_object_name = 'posts'
     form_class = PostForm  # чтобы получить доступ к форме через POST
-    paginate_by = 10  # постраничный вывод по 10
+    paginate_by = 15  # постраничный вывод по 10
 
     # общий метод для создания дополнительных атрибутов
     def get_context_data(self, **kwargs):

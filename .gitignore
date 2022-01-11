@@ -2,3 +2,8 @@
 /db.sqlite3
 /static/_index.html
 /news/mail_pass.py
+/celerybeat-schedule.bak
+/celerybeat-schedule.dat
+/celerybeat-schedule.dir
+/venv/
+/.git_bak/
