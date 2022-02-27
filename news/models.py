@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.cache import cache
 
 
 class Author(models.Model):
@@ -7,6 +8,7 @@ class Author(models.Model):
     # cвязь «один к одному» с встроенной моделью пользователей User
     # если удалили юзера, то нет смысла оставлять автора, поэтому его тоже удаляем
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # posts - FK
 
     def __str__(self):
         return self.user.username
@@ -36,6 +38,8 @@ class Category(models.Model):
     # поле для хранения подписавшихся на эту категорию пользователей
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_categories')
 
+    # posts - FK
+
     def __str__(self):
         return self.name
 
@@ -52,6 +56,7 @@ class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='posts')
     # связь «многие ко многим» с моделью Category (через дополнительную модель PostCategory)
     categories = models.ManyToManyField(Category, through='PostCategory', related_name='posts')
+    # comments - FK
 
     def get_categories(self):
         result = []
@@ -75,6 +80,11 @@ class Post(models.Model):
     def preview(self):
         # возвращает начало статьи, длиной в 124 символа и добавляет многоточие
         return self.text[:124] + '...' if len(self.text) >= 124 else self.text + '...'
+
+    # переопределение метода сохранения, чтобы он очищал кеш
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+        cache.delete(f'post-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
     def like(self):
         self.rating += 1

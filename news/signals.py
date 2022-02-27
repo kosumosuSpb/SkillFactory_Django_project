@@ -69,8 +69,6 @@ def post_save_post(**kwargs):  # получить параметры можно 
                             for category in post_instance.categories.all()
                             for user in category.subscribed_users.all()}
 
-        print('post_save_subscribers_list: ', subscribers_list, flush=True)
-
         email_from = settings.EMAIL_FROM
     
         # отправка письма с ссылкой на статью и пометкой об изменении

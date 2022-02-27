@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 from news.mail_pass import mail_pass
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import news.apps
@@ -49,6 +50,13 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'),  # Указываем, куда будем сохранять кэшируемые файлы! Не забываем создать папку cache_files внутри папки с manage.py!
+    }
+}
+
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -65,6 +73,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+# ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # EMAIL CONFIG
 EMAIL_FROM = 'dek18@yandex.ru'
@@ -212,3 +221,112 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+        'time-lvl-msg': {
+            'format': '{asctime} {levelname} {message}',
+            'style': '{',
+        },
+        'time-lvl-path-msg': {
+            'format': '{asctime} {levelname} {pathname} {message}',
+            'style': '{',
+        },
+        'time-lvl-path-msg-stack': {
+            'format': '{asctime} {levelname} {pathname} {exc_info} {message}',
+            'style': '{',
+        },
+        'time-lvl-mod-msg': {
+            'format': '{asctime} {levelname} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console-debug': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'filters': ['require_debug_true'],
+            'formatter': 'time-lvl-msg'
+        },
+        'console-warn': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'filters': ['require_debug_true'],
+            'formatter': 'time-lvl-path-msg'
+        },
+        'console-err': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'filters': ['require_debug_true'],
+            'formatter': 'time-lvl-path-msg-stack'
+        },
+        'general-info-log': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'time-lvl-mod-msg',
+            'filters': ['require_debug_false'],
+            'filename': 'general.log'
+        },
+        'security-log': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'time-lvl-mod-msg',
+            'filename': 'security.log'
+        },
+        'error-log': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'formatter': 'time-lvl-path-msg-stack',
+            'filename': 'errors.log'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+            'formatter': 'time-lvl-path-msg'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console-debug', 'console-warn', 'console-err', 'general-info-log'],
+            'propagate': True
+        },
+        'django.security': {
+            'handlers': ['security-log'],
+        },
+        'django.request': {
+            'handlers': ['mail_admins', 'error-log'],
+            'level': 'ERROR',
+        },
+        'django.server': {
+            'handlers': ['error-log'],
+            'level': 'ERROR',
+        },
+        'django.template': {
+            'handlers': ['error-log'],
+            'level': 'ERROR',
+        },
+        'django.db_backends': {
+            'handlers': ['error-log'],
+            'level': 'ERROR',
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+}

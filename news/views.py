@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from .filters import PostFilter  # импорт фильтра для представления страницы с фильтрами статей
 from .models import Post, Category  # импорт моделей поста и категорий
 from .forms import PostForm
+from django.core.cache import cache
 
 
 # вывод всех постов
@@ -67,6 +68,19 @@ class PostDetail(DetailView):
         context['is_auth'] = self.request.user.is_authenticated
         context['current_user'] = self.request.user
         return context
+
+    # переопределяем метод получения объекта, чтобы сделать кеширование постов
+    def get_object(self, *args, **kwargs):
+        # кэш очень похож на словарь, и метод get действует так же.
+        # Он забирает значение по ключу, если его нет, то забирает None.
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)  # записываем в кэш в формате: 'post-<pk>': <объект>
+
+        return obj
 
 
 # создание поста. Указываем шаблон и форму ввода
