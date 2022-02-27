@@ -7,3 +7,8 @@
 /celerybeat-schedule.dir
 /venv/
 /.git_bak/
+/uvenv/
+/errors.log
+/general.log
+/security.log
+/cache_files/*
